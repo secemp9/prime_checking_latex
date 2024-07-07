@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{expl3}
+
+\ExplSyntaxOn
+
+\int_new:N \l_prime_int
+\int_new:N \l_divisor_int
+\bool_new:N \l_is_prime_bool
+
+% Check if a number is prime
+\cs_new_protected:Npn \isprime #1
+  {
+    \int_set:Nn \l_prime_int {#1} % Set the number to be checked
+    
+    \bool_set_true:N \l_is_prime_bool % Assume the number is prime
+    
+    % Check for numbers less than 2 and non-prime conditions
+    \int_compare:nNnTF \l_prime_int < 2
+      { \bool_set_false:N \l_is_prime_bool } % Numbers less than 2 are not prime
+      {
+        % Loop to check divisibility
+        \int_step_inline:nnnn {2} {1} { \int_eval:n { floor(sqrt(\l_prime_int)) } }
+          {
+            \int_set:Nn \l_divisor_int {##1} % Set the divisor
+            
+            % Check if the number is divisible
+            \int_compare:nNnT { \int_mod:nn { \l_prime_int } { \l_divisor_int } } = {0}
+              {
+                \bool_set_false:N \l_is_prime_bool % Number is not prime if divisible
+                \int_step_break: % Exit the loop
+              }
+          }
+      }
+    
+    % Output true or false based on primality
+    \bool_if:NTF \l_is_prime_bool { true } { false }
+  }
+
+\ExplSyntaxOff
+
+\begin{document}
+
+% Example usage
+\section{Prime Checking Example}
+\begin{itemize}
+    \item 2 is prime: \textbf{\isprime{2}}
+    \item 3 is prime: \textbf{\isprime{3}}
+    \item 5 is prime: \textbf{\isprime{5}}
+    \item 12 is prime: \textbf{\isprime{12}}
+    \item 23 is prime: \textbf{\isprime{23}}
+    \item 109 is prime: \textbf{\isprime{109}}
+\end{itemize}
+
+\end{document}
